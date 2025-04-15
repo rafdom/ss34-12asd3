@@ -15,3 +15,9 @@ docker exec -it part1-r1-1 sysctl -w net.ipv4.ip_forward=1
 docker exec -it part1-r2-1 sysctl -w net.ipv4.ip_forward=1
 docker exec -it part1-r3-1 sysctl -w net.ipv4.ip_forward=1
 docker exec -it part1-r4-1 sysctl -w net.ipv4.ip_forward=1
+
+docker compose down
+docker network prune -f
+docker contianer prune -f
+
+cp ss34-12asd3/compose2.txt docker-compose.yaml
