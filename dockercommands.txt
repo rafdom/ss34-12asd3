@@ -1,0 +1,17 @@
+# Start a root shell (optional if you're already root)
+sudo bash
+
+# Bring up the full 6-node topology as defined in your docker-compose.yaml
+docker compose up -d
+
+# Add route inside HostA: tells HostA to reach HostB (10.0.6.0/24) via R1
+docker exec -it part1-ha-1 route add -net 10.0.6.0/24 gw 10.0.1.1
+
+# Add route inside HostB: tells HostB to reach HostA (10.0.1.0/24) via R3
+docker exec -it part1-hb-1 route add -net 10.0.1.0/24 gw 10.0.6.1
+
+# Enable IP forwarding on all routers (required for routing to work)
+docker exec -it part1-r1-1 sysctl -w net.ipv4.ip_forward=1
+docker exec -it part1-r2-1 sysctl -w net.ipv4.ip_forward=1
+docker exec -it part1-r3-1 sysctl -w net.ipv4.ip_forward=1
+docker exec -it part1-r4-1 sysctl -w net.ipv4.ip_forward=1
