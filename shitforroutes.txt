@@ -1,0 +1,36 @@
+
+🟦 R1  (run this to get into r1: docker exec -it r1 bash)
+# Reach net_r2_r3 via r2
+ip route add 10.0.11.0/24 via 10.0.10.3
+# Reach net_r3_r4 via r4
+ip route add 10.0.12.0/24 via 10.0.13.3
+# Reach net_r3_hb (HB) via r2
+ip route add 10.0.15.0/24 via 10.0.10.3
+
+🟦 Inside r2: (run this to get into r1: docker exec -it r2 bash)
+# Reach net_ha_r1 via r1
+ip route add 10.0.14.0/24 via 10.0.10.4
+# Reach net_r3_r4 via r3
+ip route add 10.0.12.0/24 via 10.0.11.4
+# Reach net_r1_r4 via r1
+ip route add 10.0.13.0/24 via 10.0.10.4
+# Reach net_r3_hb via r3
+ip route add 10.0.15.0/24 via 10.0.11.4
+
+🟦 Inside r3: (run this to get into r1: docker exec -it r3 bash)
+# Reach net_r1_r2 via r2
+ip route add 10.0.10.0/24 via 10.0.11.3
+# Reach net_ha_r1 via r2 → r1
+ip route add 10.0.14.0/24 via 10.0.11.3
+# Reach net_r1_r4 via r4
+ip route add 10.0.13.0/24 via 10.0.12.4
+
+🟦 Inside r4: (run this to get into r1: docker exec -it r4 bash)
+# Reach net_r2_r3 via r3
+ip route add 10.0.11.0/24 via 10.0.12.3
+# Reach net_r3_hb via r3
+ip route add 10.0.15.0/24 via 10.0.12.3
+# Reach net_ha_r1 via r1
+ip route add 10.0.14.0/24 via 10.0.13.4
+# Reach net_r1_r2 via r1
+ip route add 10.0.10.0/24 via 10.0.13.4
