@@ -1,5 +1,5 @@
 services:
-  ha:  # Host A
+  ha:
     build: .
     stdin_open: true
     tty: true
@@ -8,9 +8,9 @@ services:
     privileged: true
     networks:
       net_ha_r1:
-        ipv4_address: 10.0.1.2
+        ipv4_address: 10.0.14.3
 
-  hb:  # Host B
+  hb:
     build: .
     stdin_open: true
     tty: true
@@ -19,7 +19,7 @@ services:
     privileged: true
     networks:
       net_r3_hb:
-        ipv4_address: 10.0.6.2
+        ipv4_address: 10.0.15.3
 
   r1:
     build: .
@@ -30,11 +30,11 @@ services:
     privileged: true
     networks:
       net_ha_r1:
-        ipv4_address: 10.0.1.1
+        ipv4_address: 10.0.14.4
       net_r1_r2:
-        ipv4_address: 10.0.2.1
+        ipv4_address: 10.0.10.4
       net_r1_r4:
-        ipv4_address: 10.0.3.1
+        ipv4_address: 10.0.13.4
 
   r2:
     build: .
@@ -45,9 +45,9 @@ services:
     privileged: true
     networks:
       net_r1_r2:
-        ipv4_address: 10.0.2.2
+        ipv4_address: 10.0.10.3
       net_r2_r3:
-        ipv4_address: 10.0.4.1
+        ipv4_address: 10.0.11.3
 
   r4:
     build: .
@@ -58,9 +58,9 @@ services:
     privileged: true
     networks:
       net_r1_r4:
-        ipv4_address: 10.0.3.2
+        ipv4_address: 10.0.13.3
       net_r4_r3:
-        ipv4_address: 10.0.5.1
+        ipv4_address: 10.0.12.4
 
   r3:
     build: .
@@ -71,45 +71,45 @@ services:
     privileged: true
     networks:
       net_r2_r3:
-        ipv4_address: 10.0.4.2
+        ipv4_address: 10.0.11.4
       net_r4_r3:
-        ipv4_address: 10.0.5.2
+        ipv4_address: 10.0.12.3
       net_r3_hb:
-        ipv4_address: 10.0.6.1
+        ipv4_address: 10.0.15.4
 
 networks:
   net_ha_r1:
     ipam:
       driver: default
       config:
-        - subnet: 10.0.1.0/24
+        - subnet: 10.0.14.0/24
 
   net_r1_r2:
     ipam:
       driver: default
       config:
-        - subnet: 10.0.2.0/24
-
-  net_r1_r4:
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.0.3.0/24
+        - subnet: 10.0.10.0/24
 
   net_r2_r3:
     ipam:
       driver: default
       config:
-        - subnet: 10.0.4.0/24
+        - subnet: 10.0.11.0/24
 
   net_r4_r3:
     ipam:
       driver: default
       config:
-        - subnet: 10.0.5.0/24
+        - subnet: 10.0.12.0/24
+
+  net_r1_r4:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.13.0/24
 
   net_r3_hb:
     ipam:
       driver: default
       config:
-        - subnet: 10.0.6.0/24
+        - subnet: 10.0.15.0/24
