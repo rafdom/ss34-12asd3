@@ -1,0 +1,10 @@
+FROM ubuntu
+
+RUN apt-get update
+RUN apt-get -y install bash iproute2 net-tools tcpdump vim iputils-ping curl gnupg lsb-release
+RUN apt-get clean
+
+# Enable IP forwarding
+RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+
+CMD ["bash"]
