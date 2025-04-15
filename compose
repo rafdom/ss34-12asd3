@@ -1,0 +1,117 @@
+version: "3.9"
+
+services:
+  ha:  # Host A
+    build: .
+    stdin_open: true
+    tty: true
+    cap_add:
+      - ALL
+    privileged: true
+    networks:
+      net_ha_r1:
+        ipv4_address: 10.0.1.2
+
+  hb:  # Host B
+    build: .
+    stdin_open: true
+    tty: true
+    cap_add:
+      - ALL
+    privileged: true
+    networks:
+      net_r3_hb:
+        ipv4_address: 10.0.6.2
+
+  r1:
+    build: .
+    stdin_open: true
+    tty: true
+    cap_add:
+      - ALL
+    privileged: true
+    networks:
+      net_ha_r1:
+        ipv4_address: 10.0.1.1
+      net_r1_r2:
+        ipv4_address: 10.0.2.1
+      net_r1_r4:
+        ipv4_address: 10.0.3.1
+
+  r2:
+    build: .
+    stdin_open: true
+    tty: true
+    cap_add:
+      - ALL
+    privileged: true
+    networks:
+      net_r1_r2:
+        ipv4_address: 10.0.2.2
+      net_r2_r3:
+        ipv4_address: 10.0.4.1
+
+  r4:
+    build: .
+    stdin_open: true
+    tty: true
+    cap_add:
+      - ALL
+    privileged: true
+    networks:
+      net_r1_r4:
+        ipv4_address: 10.0.3.2
+      net_r4_r3:
+        ipv4_address: 10.0.5.1
+
+  r3:
+    build: .
+    stdin_open: true
+    tty: true
+    cap_add:
+      - ALL
+    privileged: true
+    networks:
+      net_r2_r3:
+        ipv4_address: 10.0.4.2
+      net_r4_r3:
+        ipv4_address: 10.0.5.2
+      net_r3_hb:
+        ipv4_address: 10.0.6.1
+
+networks:
+  net_ha_r1:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.1.0/24
+
+  net_r1_r2:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.2.0/24
+
+  net_r1_r4:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.3.0/24
+
+  net_r2_r3:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.4.0/24
+
+  net_r4_r3:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.5.0/24
+
+  net_r3_hb:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.6.0/24
