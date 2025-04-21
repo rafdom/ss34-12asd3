@@ -24,7 +24,7 @@ def create_topology():
     print("Creating network topology...")
     
     # Navigate to the sh_commands directory
-    os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../sh_commands"))
+    os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands"))
     
     # Build and start containers
     run_command("docker compose up -d")
@@ -39,7 +39,7 @@ def configure_routers():
     print("Installing and configuring OSPF on all routers...")
     
     # Navigate to the sh_commands directory if not already there
-    sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../sh_commands")
+    sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands")
     os.chdir(sh_commands_dir)
     
     # Install FRR on all routers
@@ -60,7 +60,7 @@ def configure_host_routes():
     print("Configuring host routes...")
     
     # Navigate to the sh_commands directory if not already there
-    sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../sh_commands")
+    sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands")
     os.chdir(sh_commands_dir)
     
     # Configure host routes
@@ -135,7 +135,7 @@ def test_connectivity():
     print("Testing network connectivity...")
     
     # Navigate to the sh_commands directory if not already there
-    sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../sh_commands")
+    sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands")
     os.chdir(sh_commands_dir)
     
     # Run connectivity tests
