@@ -48,7 +48,7 @@ def configure_routers():
     time.sleep(5)
     
     # Configure OSPF on all routers
-    run_command("./configure-all-ospf.sh")
+    run_command("./ospf-config.sh")
     print("Waiting for OSPF to converge...")
     time.sleep(10)
     
@@ -64,7 +64,7 @@ def configure_host_routes():
     os.chdir(sh_commands_dir)
     
     # Configure host routes
-    run_command("./configure-host-routes.sh")
+    run_command("./host-config.sh")
     time.sleep(2)
     
     print("Host routes configured successfully!")
@@ -139,7 +139,7 @@ def test_connectivity():
     os.chdir(sh_commands_dir)
     
     # Run connectivity tests
-    run_command("./test-connectivity.sh")
+    run_command("./test.sh")
     
     print("Connectivity test completed!")
     return True
