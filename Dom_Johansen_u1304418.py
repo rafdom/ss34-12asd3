@@ -1,3 +1,4 @@
+# Dom Johansen, u1304418, python code to orchestrate the network using scripts
 #!/usr/bin/env python3
 
 import os
@@ -7,45 +8,40 @@ import time
 import sys
 
 def run_command(command, silent=False):
-    """Execute a shell command and optionally print output"""
+    """Execute shell command and return output of the command"""
     try:
-        result = subprocess.run(command, shell=True, check=True, 
-                                text=True, capture_output=True)
+        result = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
         if not silent and result.stdout:
             print(result.stdout)
         return True, result.stdout
     except subprocess.CalledProcessError as e:
-        #print(f"Error executing command: {command}")
-        #print(f"Error message: {e.stderr}")
         return False, e.stderr
 
 def create_topology():
-    """Create the network topology with Docker Compose"""
-    print("Creating network topology...")
-    
-    # Navigate to the sh_commands directory
+    """method to create the network topology"""
+
+    # Navigate to the sh_commands
     os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands"))
     
     # Build and start containers
     run_command("docker compose up -d")
-    print("Waiting for containers to fully start...")
-    time.sleep(5)
+    print("giving countainer a second")
+    time.sleep(7)
     
-    print("Network topology created successfully!")
+    print("topology created")
     return True
 
 def configure_routers():
-    """Install and configure OSPF on all routers"""
-    print("Installing and configuring OSPF on all routers...")
+    """method to configure OSPF on all routers"""
+    print("trying to configure OSPF on routers")
     
-    # Navigate to the sh_commands directory if not already there
+    # Navigate to the sh_commands
     sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands")
     os.chdir(sh_commands_dir)
-    
-    # Install FRR on all routers
+
+    # call sh script to install frr
     run_command("./install-frr.sh")
-    print("Waiting for FRR to initialize...")
-    time.sleep(5)
+    time.sleep(7)
     
     # Configure OSPF on all routers
     run_command("./ospf-config.sh")
@@ -56,104 +52,102 @@ def configure_routers():
     return True
 
 def configure_host_routes():
-    """Configure routes on the hosts"""
-    print("Configuring host routes...")
+    """method to configure host routes"""
+    print("trying to configure host routes")
     
-    # Navigate to the sh_commands directory if not already there
+    # Navigate to the sh_commands
     sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands")
     os.chdir(sh_commands_dir)
     
-    # Configure host routes
+    # call sh script to install routes
     run_command("./host-config.sh")
-    time.sleep(2)
+    time.sleep(5)
     
-    print("Host routes configured successfully!")
+    print("host routes configured")
     return True
 
 def set_interface_cost(router, interface, cost):
-    """Set OSPF cost for a specific interface on a router"""
+    """setting cost of the interface"""
     cmd = f"docker exec -it {router} vtysh -c 'configure terminal' -c 'interface {interface}' -c 'ip ospf cost {cost}' -c 'exit' -c 'write memory'"
     success, _ = run_command(cmd)
     return success
 
 def move_traffic_north():
-    """Configure network to prefer the north path (R1-R2-R3)"""
-    print("Moving traffic to the north path (R1-R2-R3)...")
-    
+    """moving traffic to the north path"""
+    print("Moving north")
     # Set low cost on north path interfaces
-    set_interface_cost("r1", "eth0", 10)  # R1-R2 interface
-    set_interface_cost("r2", "eth0", 10)  # R2-R1 interface
-    set_interface_cost("r2", "eth1", 10)  # R2-R3 interface
-    set_interface_cost("r3", "eth0", 10)  # R3-R2 interface
+    set_interface_cost("r1", "eth0", 10)  
+    set_interface_cost("r2", "eth0", 10)  
+    set_interface_cost("r2", "eth1", 10)  
+    set_interface_cost("r3", "eth0", 10)  
     
     # Set high cost on south path interfaces
-    set_interface_cost("r1", "eth1", 100)  # R1-R4 interface
-    set_interface_cost("r4", "eth1", 100)  # R4-R1 interface
-    set_interface_cost("r4", "eth0", 100)  # R4-R3 interface
-    set_interface_cost("r3", "eth1", 100)  # R3-R4 interface
+    set_interface_cost("r1", "eth1", 150)  
+    set_interface_cost("r4", "eth1", 150)  
+    set_interface_cost("r4", "eth0", 150)  
+    set_interface_cost("r3", "eth1", 150)  
     
-    # Wait for OSPF to converge
-    print("Waiting for OSPF to converge...")
+    print("Waiting for OSPF to converge")
     time.sleep(10)
     
     # Verify the path with traceroute
-    print("Verifying path with traceroute from HostA to HostB:")
+    print("pinging from HostA to HostB")
     run_command("docker exec -it ha traceroute 10.0.15.3")
     
-    print("Traffic successfully moved to the north path!")
+    print("worked moving north")
     return True
 
 def move_traffic_south():
-    """Configure network to prefer the south path (R1-R4-R3)"""
-    print("Moving traffic to the south path (R1-R4-R3)...")
+    """moving traffic to the south path"""
+    print("moving south")
     
     # Set high cost on north path interfaces
-    set_interface_cost("r1", "eth0", 100)  # R1-R2 interface
-    set_interface_cost("r2", "eth0", 100)  # R2-R1 interface
-    set_interface_cost("r2", "eth1", 100)  # R2-R3 interface
-    set_interface_cost("r3", "eth0", 100)  # R3-R2 interface
+    set_interface_cost("r1", "eth0", 150) 
+    set_interface_cost("r2", "eth0", 150) 
+    set_interface_cost("r2", "eth1", 150)
+    set_interface_cost("r3", "eth0", 150) 
     
     # Set low cost on south path interfaces
-    set_interface_cost("r1", "eth1", 10)  # R1-R4 interface
-    set_interface_cost("r4", "eth1", 10)  # R4-R1 interface
-    set_interface_cost("r4", "eth0", 10)  # R4-R3 interface
-    set_interface_cost("r3", "eth1", 10)  # R3-R4 interface
+    set_interface_cost("r1", "eth1", 10)  
+    set_interface_cost("r4", "eth1", 10) 
+    set_interface_cost("r4", "eth0", 10) 
+    set_interface_cost("r3", "eth1", 10)  
     
     # Wait for OSPF to converge
     print("Waiting for OSPF to converge...")
     time.sleep(10)
     
     # Verify the path with traceroute
-    print("Verifying path with traceroute from HostA to HostB:")
+    print("pinging from HostA to HostB")
     run_command("docker exec -it ha traceroute 10.0.15.3")
     
-    print("Traffic successfully moved to the south path!")
+    print("worked moving south")
     return True
 
 def test_connectivity():
-    """Test network connectivity"""
-    print("Testing network connectivity...")
+    """testing"""
+    print("testing connectivity")
     
-    # Navigate to the sh_commands directory if not already there
+    # Navigate to the sh_commands
     sh_commands_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sh_commands")
     os.chdir(sh_commands_dir)
     
-    # Run connectivity tests
+    # Run shell script to test connectivity
     run_command("./test.sh")
     
-    print("Connectivity test completed!")
+    print("Connectivity test over, if no errors printed before, everything working")
     return True
 
-def get_current_path():
-    """Determine the current path being used"""
+def get_current_path(): # simple helper method for toggling routes
+    """finding the current path"""
     success, output = run_command("docker exec -it ha traceroute -n 10.0.15.3", silent=True)
     if success and "10.0.13.3" in output:
         return "south"  # R1-R4-R3 path
     else:
         return "north"  # R1-R2-R3 path
 
-def toggle_path():
-    """Toggle between north and south paths"""
+def toggle_path(): # method to toggle the path of the route
+    """Toggle path of route"""
     current_path = get_current_path()
     print(f"Current path is: {current_path}")
     
@@ -176,23 +170,22 @@ def main():
     group.add_argument("--create", action="store_true", 
                        help="Create the network topology")
     group.add_argument("--configure-ospf", action="store_true", 
-                       help="Configure OSPF on all routers")
+                       help="call the ospf config script")
     group.add_argument("--host-routes", action="store_true", 
-                       help="Configure routes on all hosts")
+                       help="call the host route config script")
     group.add_argument("--north", action="store_true", 
-                       help="Move traffic to the north path (R1-R2-R3)")
+                       help="Move traffic to the north path (R1->R2->R3)")
     group.add_argument("--south", action="store_true", 
-                       help="Move traffic to the south path (R1-R4-R3)")
+                       help="Move traffic to the south path (R1->R4->R3)")
     group.add_argument("--toggle", action="store_true", 
-                       help="Toggle between north and south paths")
+                       help="Toggle paths")
     group.add_argument("--test", action="store_true", 
-                       help="Test network connectivity")
+                       help="test connectivity")
     group.add_argument("--setup-all", action="store_true", 
-                       help="Run complete setup (create topology, configure OSPF, set host routes)")
+                       help="run all setup steps in order")
     
     args = parser.parse_args()
     
-    # Execute the selected operation
     if args.create:
         create_topology()
     elif args.configure_ospf:
@@ -212,9 +205,7 @@ def main():
         configure_routers()
         configure_host_routes()
         test_connectivity()
-        print("\nNetwork setup complete. Current path:")
-        current_path = get_current_path()
-        print(f"Using the {current_path} path (R1-{'R2-R3' if current_path == 'north' else 'R4-R3'})")
+
 
 if __name__ == "__main__":
     main()
