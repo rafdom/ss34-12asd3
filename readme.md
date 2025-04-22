@@ -7,7 +7,8 @@
   get ./dockersetup in cs4480-2025-s/pa3/part1/
   afterwards put sh-command folder and python folder in part1/
   move the Dockerfile from the sh_command folder into part1 folder. 
-
+  modify the docker-compose.yaml in /part1/ to be the one downloaded
+  
     afterwards call "chmod +x part1/*.sh" and 
                     "chmod +x part2/Dom_Johansen_u1304418.py"
 
