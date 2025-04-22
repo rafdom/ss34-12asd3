@@ -26,3 +26,7 @@ Ive cut the time inbetween changing from north to south just so it wouldnt go ov
 ./orch.py --north and ./orch.py --south (the python file name isn't correct but its code is the same as the submission python file)
 you see i start pinging HostB from hostA, i change the path so its north -> south -> north, afterwards i Ctrl-C hostA ping, and you see 
 that there is no packet loss during changing paths. 
+
+**Quick clarifications for Demo Video**
+1. cuts are used since it was taking a long time for the shell script to move from north to south (it was monday (4/21/2025) and people were saying powder was giving slow connectivity problems) so to have it within the wanted time frame I just paused the recording until the script finished.
+2. the file is not called "Dom_Johansen_u1304418.py" but called "orch.py", it is the same python code just renamed.
